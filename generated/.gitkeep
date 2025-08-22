@@ -1,0 +1,5 @@
+
+
+
+//Para que tome en cuenta esta carpeta de generated ya que git no toma en cuenta carpetas vacias y se necesita para ir guardando los archivos generados.
+// Se podran guardar los archivos en otro repositorio como firebase, storage etc 
