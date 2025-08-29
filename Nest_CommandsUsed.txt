@@ -1,0 +1,3 @@
+// Comando del CLI de NestJS, scaffolding completo para configuracion inicial
+ 
+   nest g res sam-assistant

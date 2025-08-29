@@ -51,8 +51,9 @@ export const imageGenerationUseCase = async (
   const pngImagePath = await downloadImageAsPng(originalImage, true);
   const maskPath = await downloadBase64ImageAsPng(maskImage, true);
 
+  //ToDo: Verificar el modelo para que genere la edicion en OpenAI con mask porque esta fallando. Es un ISSUE del API
   const response = await openai.images.edit({
-    model: 'dall-e-3',
+    model: 'dall-e-2',
     prompt: prompt,
     image: fs.createReadStream(pngImagePath),
     mask: fs.createReadStream(maskPath),
@@ -62,6 +63,7 @@ export const imageGenerationUseCase = async (
     response_format: 'url',
   });
 
+  console.log(response);
   const localImagePath = await downloadImageAsPng(
     Array.isArray(response.data) && response.data[0]?.url
       ? response.data[0].url
