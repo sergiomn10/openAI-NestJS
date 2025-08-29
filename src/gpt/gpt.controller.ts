@@ -115,16 +115,13 @@ export class GptController {
       }),
     )
     file: Express.Multer.File,
-    @Body() audioToText:AudioToTextDto
+    @Body() audioToText: AudioToTextDto,
   ) {
-
-    return this.gptService.audioToText(file,audioToText);
+    return this.gptService.audioToText(file, audioToText);
   }
 
   @Post('image-generation')
-  async imageGeneration(
-    @Body() imageGenerationDto: ImageGenerationDto,
-  ){
+  async imageGeneration(@Body() imageGenerationDto: ImageGenerationDto) {
     return this.gptService.imageGeneration(imageGenerationDto);
   }
 
@@ -132,7 +129,7 @@ export class GptController {
   async getGeneratedImage(
     @Res() res: Response,
     @Param('filename') filename: string,
-  ){
+  ) {
     const filePath = await this.gptService.getGeneratedImage(filename);
 
     res.setHeader('Content-Type', 'image/png');
@@ -140,10 +137,39 @@ export class GptController {
     res.sendFile(filePath);
   }
 
-   @Post('image-variation')
-  async imageVariation(
-    @Body() imageVariationDto: ImageVariationDto,
-  ){
+  @Post('image-variation')
+  async imageVariation(@Body() imageVariationDto: ImageVariationDto) {
     return this.gptService.generateImageVariation(imageVariationDto);
+  }
+
+  @Post('extract-text-from-image')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './generated/uploads',
+        filename: (req, file, callback) => {
+          const fileExtension = file.originalname.split('.').pop();
+          const fileName = `${new Date().getTime()}.${fileExtension}`;
+          return callback(null, fileName);
+        },
+      }),
+    }),
+  )
+  async extractTextFromImage(
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({
+            maxSize: 1000 * 1024 * 5,
+            message: 'File is bigger than 5 mb ',
+          }),
+          new FileTypeValidator({ fileType: 'image/*' }),
+        ],
+      }),
+    )
+    file: Express.Multer.File,
+    @Body('prompt') prompt: string,
+  ) {
+    return this.gptService.imageToText(file, prompt);
   }
 }
